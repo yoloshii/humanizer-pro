@@ -58,6 +58,8 @@ Trigger: "check this for AI patterns," "review this against humanizer," "does th
 
 ## Constraint priority tiers
 
+Not all 35 constraints carry equal weight.
+
 - **Tier 1** (C1, C9, C21, C23, C24, C26, C34): Single match flags the piece. Always rewrite.
 - **Tier 2** (C3, C4, C10, C12, C28, C32, C33): One instance may pass. Two is a pattern.
 - **Tier 3** (C2, C5, C7, C8, C11, C13, C14, C15, C20, C22, C25, C27): Contextual. Check before rewriting.
