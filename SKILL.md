@@ -169,7 +169,7 @@ Write the piece with all 35 constraints loaded. Each constraint below includes i
 
 #### C15. Em Dash Discipline
 
-**Rule:** Maximum one em dash per 500 words. Zero is better. If you catch yourself reaching for an em dash, use a comma, a period, or parentheses. Note: some newer models (2025+) use em dashes less, but the pattern remains a tell in aggregate.
+**Rule:** Maximum one em dash (or double-hyphen substitute) per 500 words. Zero is better. If you catch yourself reaching for an em dash or typing ` -- ` as a parenthetical separator, use a comma, a period, or parentheses. Note: some newer models (2025+) use em dashes less, but the pattern remains a tell in aggregate. Double hyphens used as em dash substitutes count toward the same limit; double hyphens in CLI flags (--enable-features) and code do not.
 
 #### C16. Boldface Restraint
 
@@ -413,8 +413,9 @@ Run these grep patterns against the draft. Any hit requires a rewrite of that se
 **Medium-confidence (review, may be legitimate):**
 
 ```
-# Em dash density (C15)
+# Em dash density (C15) -- includes double-hyphen substitutes
 —
+ --
 
 # Rule of three (three comma-separated abstract nouns) (C12)
 \b\w+tion,\s+\w+tion,\s+and\s+\w+tion\b
