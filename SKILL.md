@@ -56,9 +56,9 @@ Memorize the constraint categories:
 
 Not all constraints carry equal weight. During composition, allocate attention by priority:
 
-- **Tier 1 (instant tells, always rewrite)**: C1, C9, C21, C23, C24, C26, C34. A single hit from any of these is enough to flag a piece. These are the patterns detectors and human reviewers catch first.
+- **Tier 1 (instant tells, always rewrite)**: C1, C9, C15, C21, C23, C24, C26, C34. A single hit from any of these is enough to flag a piece. These are the patterns detectors and human reviewers catch first.
 - **Tier 2 (strong signals, rewrite on sight)**: C3, C4, C10, C12, C28, C32, C33. One instance may pass; two in the same piece is a pattern.
-- **Tier 3 (contextual, check before rewriting)**: C2, C5, C7, C8, C11, C13, C14, C15, C20, C22, C25, C27. These are legitimate in some contexts. Flag them, but don't blindly rewrite.
+- **Tier 3 (contextual, check before rewriting)**: C2, C5, C7, C8, C11, C13, C14, C20, C22, C25, C27. These are legitimate in some contexts. Flag them, but don't blindly rewrite.
 - **Tier 4 (holistic, assess in structural audit)**: C6, C16, C17, C18, C19, C29, C30, C31, C35. These can't be caught per-sentence. Evaluate at the draft level in Pass 2.
 
 **Instruction-layer note:** These instructions use structured lists, bold labels, tables, colon-prefixed items, and uniformly authoritative tone. This formatting is optimized for LLM instruction parsing. Do not replicate it in output. The constraints below govern what you write for the user, not how these instructions are formatted.
@@ -169,7 +169,11 @@ Write the piece with all 35 constraints loaded. Each constraint below includes i
 
 #### C15. Em Dash Discipline
 
-**Rule:** Maximum one em dash (or double-hyphen substitute) per 500 words. Zero is better. If you catch yourself reaching for an em dash or typing ` -- ` as a parenthetical separator, use a comma, a period, or parentheses. Note: some newer models (2025+) use em dashes less, but the pattern remains a tell in aggregate. Double hyphens used as em dash substitutes count toward the same limit; double hyphens in CLI flags (--enable-features) and code do not.
+**Kill on sight:** Em dashes (—), double-hyphen substitutes ( -- ), and any parenthetical dash separator. LLMs use em dashes at 3-10x the rate of human writers. This is the single most visible structural tell in 2026 output. Readers and detectors flag it before vocabulary or tone.
+
+**Rule:** Maximum one em dash (or double-hyphen substitute) per 500 words. Zero is better. Every time you reach for an em dash, stop and use a period, a comma, or parentheses instead. Rewrite the sentence if needed. Double hyphens in CLI flags (--enable-features) and code are exempt.
+
+**Self-check:** After drafting, count em dashes and double-hyphen separators across the entire piece. If count exceeds (word_count / 500), rewrite until it doesn't. A 1500-word piece gets a maximum of 3. A 500-word piece gets 1. A 200-word Discord post gets 0.
 
 #### C16. Boldface Restraint
 
@@ -408,15 +412,15 @@ Run these grep patterns against the draft. Any hit requires a rewrite of that se
 
 # Nominalization chains (C32)
 (the implementation of|the utilization of|the facilitation of|the integration of)
+
+# Em dashes (C15) -- TIER 1: most visible structural tell in 2026
+—
+ --
 ```
 
 **Medium-confidence (review, may be legitimate):**
 
 ```
-# Em dash density (C15) -- includes double-hyphen substitutes
-—
- --
-
 # Rule of three (three comma-separated abstract nouns) (C12)
 \b\w+tion,\s+\w+tion,\s+and\s+\w+tion\b
 
@@ -508,7 +512,7 @@ If the user requested the piece in a file, use Write/Edit to save it. If they re
 | C12 | No forced rule-of-three | Language | Three abstract nouns in sequence |
 | C13 | No synonym cycling | Language | Rotating referents for same entity |
 | C14 | No false ranges | Language | from X to Y, from A to B |
-| C15 | Em dash discipline | Style | Max 1 per 500 words |
+| C15 | Em dash discipline (TIER 1) | Style | Kill on sight. Max 1 per 500 words. Most visible structural tell. |
 | C16 | Boldface restraint | Style | Only structural headers |
 | C17 | No inline-header lists | Style | `**Label:** content` bullets |
 | C18 | Sentence case headings | Style | Title Case Headings |
