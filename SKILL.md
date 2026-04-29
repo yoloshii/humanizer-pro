@@ -1,21 +1,28 @@
 ---
 name: humanizer-pro
+version: 2.1.0
+license: MIT
+compatibility: claude-code opencode
 description: |
-  Generates human-sounding text from scratch using 35 anti-AI-pattern constraints applied during composition. Use when writing reports, analyses, articles, feedback documents, essays, documentation, blog posts, or any substantial text where AI detection is a concern. Also use when user says "write this like a human," "make it sound natural," "no AI slop," or "use humanizer." Handles voice calibration, constraint-driven composition, rhythm variation, opinion injection, specificity passes, and three-pass automated verification (pattern scan, structural audit, read-aloud test). Aligned with Wikipedia:Signs of AI writing (February 2026 revision) and peer-reviewed stylometric research (2024-2026).
-allowed-tools: "Read Write Edit Grep AskUserQuestion"
-metadata:
-  version: 2.0.0
+  Generates human-sounding text from scratch using 39 anti-AI-pattern constraints applied during composition. Use when writing reports, analyses, articles, feedback documents, essays, documentation, blog posts, or any substantial text where AI detection is a concern. Also use when user says "write this like a human," "make it sound natural," "no AI slop," or "use humanizer." Handles voice calibration (including writing-sample matching), constraint-driven composition, rhythm variation, opinion injection, specificity passes, and four-pass automated verification (pattern scan, structural audit, self-audit, read-aloud). Aligned with Wikipedia:Signs of AI writing (April 2026 revision), upstream blader/humanizer 2.5.1, and peer-reviewed stylometric research (2024-2026).
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - AskUserQuestion
 ---
 
 # Humanizer Pro: Write like a human from the start
 
 ## Quick start
 
-1. Determine voice profile (register, perspective, stance, audience)
-2. Load 35 anti-pattern constraints as active composition rules
+1. Determine voice profile (register, perspective, stance, audience). Optionally calibrate from a writing sample (Phase 1A.5).
+2. Load 39 anti-pattern constraints as active composition rules
 3. Write the piece with constraints applied per-sentence
 4. Inject voice: vary rhythm, insert opinions, add specifics, allow imperfection
-5. Run three-pass verification: pattern scan (Grep), structural audit, read-aloud test
+5. Run four-pass verification: pattern scan (Grep), structural audit, self-audit, read-aloud test
 6. Output clean text with no meta-commentary
 
 ## When to use
@@ -44,7 +51,7 @@ Lock these before writing. If the user hasn't specified, infer from context. A f
 
 ### 1B. Load anti-pattern constraints
 
-These 35 constraints are active during composition. They are not a checklist to run afterward. They shape every sentence as you write it.
+These 39 constraints are active during composition. They are not a checklist to run afterward. They shape every sentence as you write it.
 
 Memorize the constraint categories:
 - **Content (1-8)**: What you say and how you source it
@@ -53,15 +60,38 @@ Memorize the constraint categories:
 - **Communication (21-25)**: Chatbot artifacts and paste residue
 - **Filler/Hedging (26-28)**: Verbal padding
 - **Epistemic/Structural (29-35)**: How you think and organize on the page
+- **Voice/Form (36-39)**: Specific surface tells from upstream consensus (passive voice, hyphenated pairs, signposting, fragmented headers)
 
 Not all constraints carry equal weight. During composition, allocate attention by priority:
 
-- **Tier 1 (instant tells, always rewrite)**: C1, C9, C15, C21, C23, C24, C26, C34. A single hit from any of these is enough to flag a piece. These are the patterns detectors and human reviewers catch first.
-- **Tier 2 (strong signals, rewrite on sight)**: C3, C4, C10, C12, C28, C32, C33. One instance may pass; two in the same piece is a pattern.
+- **Tier 1 (instant tells, always rewrite)**: C1, C9, C15, C21, C23, C24, C26, C34, C37. A single hit from any of these is enough to flag a piece. These are the patterns detectors and human reviewers catch first.
+- **Tier 2 (strong signals, rewrite on sight)**: C3, C4, C10, C12, C28, C32, C33, C36, C38. One instance may pass; two in the same piece is a pattern.
 - **Tier 3 (contextual, check before rewriting)**: C2, C5, C7, C8, C11, C13, C14, C20, C22, C25, C27. These are legitimate in some contexts. Flag them, but don't blindly rewrite.
-- **Tier 4 (holistic, assess in structural audit)**: C6, C16, C17, C18, C19, C29, C30, C31, C35. These can't be caught per-sentence. Evaluate at the draft level in Pass 2.
+- **Tier 4 (holistic, assess in structural audit)**: C6, C16, C17, C18, C19, C29, C30, C31, C35, C39. These can't be caught per-sentence. Evaluate at the draft level in Pass 2.
 
 **Instruction-layer note:** These instructions use structured lists, bold labels, tables, colon-prefixed items, and uniformly authoritative tone. This formatting is optimized for LLM instruction parsing. Do not replicate it in output. The constraints below govern what you write for the user, not how these instructions are formatted.
+
+### 1A.5. Voice calibration from a writing sample (optional)
+
+If the user provided a writing sample (their own previous writing, or a target voice), read it before drafting. Match the sample's surface features rather than imposing a generic "natural" voice.
+
+When you read the sample, note:
+
+- **Sentence length patterns** — short and punchy? Long and flowing? Mixed cadence? What is the typical range?
+- **Word choice level** — casual ("stuff", "thing"), academic ("artifact", "construct"), or somewhere between? Don't upgrade their casual words to formal ones in the rewrite.
+- **Paragraph openings** — do they jump straight in, or set context first? Mirror that pattern.
+- **Punctuation habits** — lots of dashes, parenthetical asides, semicolons? Match their punctuation rhythm (subject to the C15 em dash cap).
+- **Recurring phrases or verbal tics** — preserve them. If they always write "I keep thinking about", let it appear in the rewrite.
+- **Transitions** — do they use explicit connectors ("So,", "Anyway,") or just start the next point? Don't add transitions they wouldn't.
+
+When matching their voice, do not just remove AI patterns — replace them with patterns from the sample. If they write short sentences, do not produce long ones. If they use "stuff" and "things", don't promote those to "elements" and "components".
+
+When no sample is provided, fall back to the default voice profile from 1A and the personality guidance in Phase 3.
+
+**How users supply samples:**
+
+- Inline: "Humanize this. Here's a sample of my writing for voice matching: [text]"
+- File: "Humanize this. Use my writing style from [path] as a reference."
 
 ### 1C. Prime the rhythm
 
@@ -71,7 +101,7 @@ Write a throwaway opening sentence that is deliberately short. Under 8 words. Th
 
 ## Phase 2: Composition (active constraints)
 
-Write the piece with all 35 constraints loaded. Each constraint below includes its trigger patterns and what to do instead.
+Write the piece with all 39 constraints loaded. Each constraint below includes its trigger patterns and what to do instead.
 
 ### Content constraints
 
@@ -93,11 +123,21 @@ Write the piece with all 35 constraints loaded. Each constraint below includes i
 
 **Instead:** End the sentence. Start a new one. The -ing phrase is almost always a second idea crammed onto the first.
 
-#### C4. No Promotional Tone
+#### C4. No Promotional Tone or Persuasive Authority Tropes
 
-**Kill on sight:** boasts a, vibrant, rich (figurative), profound, enhancing its, exemplifies, commitment to, natural beauty, nestled, in the heart of, groundbreaking (figurative), renowned, breathtaking, must-visit, stunning, at its core, in the realm of, shed light on, a myriad of
+**Kill on sight (promotional):** boasts a, vibrant, rich (figurative), profound, enhancing its, exemplifies, commitment to, natural beauty, nestled, in the heart of, groundbreaking (figurative), renowned, breathtaking, must-visit, stunning, a myriad of, shed light on
 
-**Instead:** Describe concretely. Dimensions, dates, names, numbers. "A 200-seat restaurant that opened in 2019" not "a vibrant dining destination."
+**Kill on sight (persuasive authority tropes):** the real question is, at its core, in reality, what really matters, fundamentally, the deeper issue, the heart of the matter, in the realm of
+
+**Problem:** LLMs use persuasive authority tropes to pretend they are cutting through noise to some deeper truth. The sentence that follows usually just restates an ordinary point with extra ceremony.
+
+**Before:**
+> The real question is whether teams can adapt. At its core, what really matters is organizational readiness.
+
+**After:**
+> The question is whether teams can adapt. That mostly depends on whether the organization is ready to change its habits.
+
+**Instead:** Describe concretely. Dimensions, dates, names, numbers. "A 200-seat restaurant that opened in 2019" not "a vibrant dining destination." When tempted to write "the real question is", just write the question. When tempted to write "fundamentally", just state the point.
 
 #### C5. No Vague Attributions or Source Inflation
 
@@ -129,9 +169,9 @@ Write the piece with all 35 constraints loaded. Each constraint below includes i
 
 #### C9. No AI Vocabulary Words
 
-**Kill on sight:** Additionally, align with, comprehensive, crucial, delve, emphasizing, enduring, enhance, exhibited, fostering, garner, highlight (verb), insights, interplay, intricate/intricacies, key (adjective), landscape (abstract), meticulous, multifaceted, notably, particularly, pivotal, realm, showcase, swift, tapestry (abstract), testament, underscore (verb), valuable, vibrant, within (when "in" works)
+**Kill on sight:** Actually, Additionally, align with, comprehensive, crucial, delve, emphasizing, enduring, enhance, exhibited, fostering, garner, highlight (verb), insights, interplay, intricate/intricacies, key (adjective), landscape (abstract), meticulous, multifaceted, notably, particularly, pivotal, realm, showcase, swift, tapestry (abstract), testament, underscore (verb), valuable, vibrant, within (when "in" works)
 
-**Instead:** Use the plainest word that works. "Important" not "crucial." "Show" not "showcase." "Also" not "Additionally." "Thorough" not "comprehensive." "Showed" not "exhibited." Most of these words have simple equivalents.
+**Instead:** Use the plainest word that works. "Important" not "crucial." "Show" not "showcase." "Also" not "Additionally." "Thorough" not "comprehensive." "Showed" not "exhibited." Most of these words have simple equivalents. "Actually" almost always means nothing — delete it.
 
 **Note:** "delve" dropped off sharply in 2025 LLM output but remains a strong historical tell. Words like "comprehensive," "notably," "particularly," "within," and "multifaceted" were identified by Kobak et al. (2024) as having the highest excess frequency in LLM output vs. human baselines. Co-occurrence is the real signal: one or two of these words may be coincidence; five in the same piece is not.
 
@@ -141,11 +181,19 @@ Write the piece with all 35 constraints loaded. Each constraint below includes i
 
 **Instead:** Write "is" or "has." Gallery 825 is the exhibition space. The building has four rooms. Stop flinching from simple verbs.
 
-#### C11. No Negative Parallelisms
+#### C11. No Negative Parallelisms or Tailing Negations
 
-**Kill on sight:** Not only...but..., It's not just about..., it's..., It's not merely...it's..., no..., no..., just...
+**Kill on sight (parallelism):** Not only...but..., It's not just about..., it's..., It's not merely...it's..., no..., no..., just...
 
-**Instead:** State the positive claim directly. "The beat adds aggression" not "It's not just about the beat, it's about the aggression."
+**Kill on sight (tailing negation):** Clipped fragments tacked onto sentence ends to mimic punchy ad copy. "no guessing", "no wasted motion", "no friction", "no surprises", "no nonsense" appearing as standalone clauses after a comma.
+
+**Before (tailing negation):**
+> The options come from the selected item, no guessing.
+
+**After:**
+> The options come from the selected item without forcing the user to guess.
+
+**Instead:** State the positive claim directly. "The beat adds aggression" not "It's not just about the beat, it's about the aggression." For tailing negations, expand the fragment into a real clause or rewrite as a positive statement.
 
 #### C12. No Rule-of-Three Forcing
 
@@ -313,6 +361,70 @@ Write the piece with all 35 constraints loaded. Each constraint below includes i
 
 **Instead:** Let the material drive the style. A section describing methodology can be dry and precise. A section discussing implications can be looser and more speculative. An anecdote should sound like a story, not like a report. If every section of a 3000-word piece could be shuffled without anyone noticing, the style is too uniform.
 
+### Voice/Form constraints
+
+#### C36. No Passive Voice Hiding or Subjectless Fragments
+
+**Kill on sight:** Passive constructions that hide who did what ("the results are preserved automatically", "the decision was made", "the configuration is loaded"). Subjectless ad-copy fragments that drop the subject entirely ("No configuration file needed.", "Just works.", "Ready in seconds.").
+
+**Problem:** LLMs default to passive voice and subjectless fragments because they sound technically clean. They actually obscure who acts and what does the work. Active voice with a real subject is harder for AI to produce and easier for humans to read.
+
+**Before:**
+> No configuration file needed. The results are preserved automatically.
+
+**After:**
+> You do not need a configuration file. The system preserves the results automatically.
+
+**Instead:** Name the actor. "The system preserves" not "is preserved." "You configure" not "configuration is required." Some passive voice is legitimate (when the actor is unknown or genuinely irrelevant). The tell is the *frequency* and the *fragment-style brevity* of these constructions.
+
+#### C37. No Hyphenated Word Pair Overuse (TIER 1)
+
+**Kill on sight:** AI hyphenates common compound modifiers with perfect consistency. Watch for: third-party, cross-functional, client-facing, data-driven, decision-making, well-known, high-quality, real-time, long-term, end-to-end, top-tier, cutting-edge, future-proof, customer-facing, user-friendly, mission-critical.
+
+**Problem:** Humans rarely hyphenate these uniformly. When a human does hyphenate, it's inconsistent ("data-driven" in one paragraph, "data driven" in the next). Perfect uniform hyphenation across 5+ compound modifiers in the same piece is one of the strongest 2026 AI tells. Less common or technical compounds (purpose-built, well-typed, copy-on-write) remain fine to hyphenate.
+
+**Before:**
+> The cross-functional team delivered a high-quality, data-driven report on our client-facing tools. Their decision-making process was well-known for being thorough and detail-oriented.
+
+**After:**
+> The cross functional team delivered a high quality, data driven report on our client facing tools. Their decision making process was known for being thorough and detail oriented.
+
+**Instead:** Drop the hyphens from common compound modifiers. Keep them only where the meaning genuinely needs them (a "small-business owner" vs a "small business owner" — only one is grammatically ambiguous without the hyphen). Tier 1 because the visual uniformity is detector-friendly and reader-noticeable.
+
+#### C38. No Signposting Announcements
+
+**Kill on sight:** Let's dive in, let's explore, let's break this down, here's what you need to know, now let's look at, without further ado, in this section we will, before we begin, by the end of this you will
+
+**Problem:** LLMs announce what they are about to do instead of doing it. This meta-commentary slows the writing down and gives it a tutorial-script feel. Distinct from C21 (chatbot artifacts like "I hope this helps") — signposting is pedagogical/instructional tone bleeding into prose.
+
+**Before:**
+> Let's dive into how caching works in Next.js. Here's what you need to know.
+
+**After:**
+> Next.js caches data at multiple layers: request memoization, the data cache, and the router cache.
+
+**Instead:** Just start the topic. The reader knows you are about to explain something — they are reading the section. Strip every "let's", "here's what you need to know", and "in this section" sentence. The content underneath is almost always intact without the announcement.
+
+#### C39. No Fragmented Headers
+
+**Rule:** A heading should be followed by real content, not by a one-line paragraph that restates the heading.
+
+**Kill on sight:** A header followed by a sentence that says the obvious thing about the topic, then a blank line, then the actual content begins. The restatement adds nothing — it is rhetorical warm-up.
+
+**Before:**
+> ## Performance
+>
+> Speed matters.
+>
+> When users hit a slow page, they leave.
+
+**After:**
+> ## Performance
+>
+> When users hit a slow page, they leave.
+
+**Instead:** Cut the warm-up line. Start directly with the substantive content. If the header is "Performance", the reader does not need a sentence telling them performance is important — get to the point.
+
 ---
 
 ## Phase 3: Voice injection (during and after composition)
@@ -358,7 +470,7 @@ Don't force these. But don't sterilize them out either.
 
 ## Phase 4: Verification (after draft is complete)
 
-Three automated passes, run in order. Each pass targets a different failure mode.
+Four passes, run in order. Pass 1 and Pass 2 are mechanical (grep + checklist). Pass 3 is introspective (ask yourself the question). Pass 4 is sensory (read aloud). Each pass targets a different failure mode.
 
 ### Pass 1: Pattern scan (automated)
 
@@ -370,11 +482,12 @@ Run these grep patterns against the draft. Any hit requires a rewrite of that se
 # Content inflation (C1)
 \b(testament|pivotal|landscape|tapestry|indelible|enduring legacy)\b
 
-# AI vocabulary (C9)
-\b(Additionally|delve|intricacies|interplay|underscore|showcase|fostering|garner|comprehensive|exhibited|multifaceted|notably|particularly|meticulous|swift)\b
+# AI vocabulary (C9)  -- includes "actually" added in v2.1.0
+\b(Actually|Additionally|delve|intricacies|interplay|underscore|showcase|fostering|garner|comprehensive|exhibited|multifaceted|notably|particularly|meticulous|swift)\b
 
-# Promotional (C4)
+# Promotional + persuasive authority tropes (C4)
 \b(vibrant|groundbreaking|breathtaking|nestled|renowned|stunning|must-visit)\b
+(the real question is|at its core|in reality|what really matters|fundamentally|the deeper issue|the heart of the matter|in the realm of)
 
 # Copula avoidance (C10)
 \b(serves as|stands as|boasts a|features a)\b
@@ -397,6 +510,15 @@ Run these grep patterns against the draft. Any hit requires a rewrite of that se
 
 # Chatbot tracking artifacts (C24)
 (utm_source=|citeturn\d|contentReference|oaicite|oai_citation|grok_card|attached_file|INSERT_SOURCE|attributableIndex)
+
+# Hyphenated word pair overuse (C37) -- TIER 1: count uniform-hyphen instances
+\b(third-party|cross-functional|client-facing|customer-facing|data-driven|decision-making|well-known|high-quality|real-time|long-term|end-to-end|top-tier|cutting-edge|future-proof|user-friendly|mission-critical)\b
+
+# Signposting announcements (C38)
+(Let's dive in|let's explore|let's break this down|here's what you need to know|now let's look at|without further ado|in this section we will|before we begin|by the end of this you will)
+
+# Subjectless ad-copy fragments (C36)
+^(No \w+ needed|Just works|Ready in seconds|Built for|Designed for)\.?$
 
 # RAG disclaimers (C22)
 (in the provided sources|in the available sources|not widely documented|not widely disclosed|maintains a low profile|keeps personal details private)
@@ -426,6 +548,12 @@ Run these grep patterns against the draft. Any hit requires a rewrite of that se
 
 # Negative parallelism (C11)
 (not just|not only|not merely).{0,30}(but also|it's about|it's a)
+
+# Tailing negation fragments (C11)
+,\s*(no guessing|no wasted motion|no friction|no surprises|no nonsense)\.?$
+
+# Passive voice hiding (C36) -- common subjectless or actor-hiding constructions
+\b(is preserved|are preserved|is loaded|are loaded|is configured|are configured)\s+(automatically|by default)\b
 
 # False ranges (C14)
 from\s+.{5,30}\s+to\s+.{5,30},\s+from\s+
@@ -464,7 +592,21 @@ Check these by reading, not by grep:
 
 10. **Noun-verb check (C32)**: Pick any paragraph. Count nouns and verbs. If nouns outnumber verbs by more than 3:1, rewrite nominalized phrases into active constructions.
 
-### Pass 3: Read-aloud test
+### Pass 3: Self-audit (introspective)
+
+After Pass 1 and Pass 2, ask yourself the question explicitly:
+
+> "What makes the below so obviously AI generated?"
+
+Then answer in 2-5 brief bullets, naming the residual tells you can still see. Be specific: not "tone is off" but "the rhythm is too tidy, the conclusion still slogan-y, the named example reads as plausible-but-fictional".
+
+Then revise once more, with the prompt:
+
+> "Now make it not obviously AI generated."
+
+This pass catches what Pass 1 (regex) and Pass 2 (structural) cannot — the holistic "this still smells AI" signal that comes from rhythm, voice, and trust calibration. It is cheap (one more scan) and high-value: most pieces still have one or two tells after Pass 1+2 that only surface when you ask the question directly.
+
+### Pass 4: Read-aloud test
 
 Read the opening paragraph and the closing paragraph aloud (mentally). Check:
 
@@ -494,21 +636,21 @@ If the user requested the piece in a file, use Write/Edit to save it. If they re
 
 ---
 
-## Quick reference: the 35 constraints
+## Quick reference: the 39 constraints
 
 | # | Constraint | Category | Trigger |
 |---|-----------|----------|---------|
 | C1 | No significance inflation | Content | testament, pivotal, crucial, vital |
 | C2 | No notability puffing | Content | media outlets, social media presence |
 | C3 | No participial filler | Content | -ing phrases tacked onto sentences |
-| C4 | No promotional tone | Content | vibrant, nestled, at its core, myriad |
+| C4 | No promotional tone or persuasive authority tropes | Content | vibrant, nestled, the real question is, fundamentally, at its core |
 | C5 | No vague attributions / source inflation | Content | Experts argue, several sources |
 | C6 | No formulaic sections | Content | Despite challenges, In conclusion |
 | C7 | No title-as-proper-noun openings | Content | "X is a [category] that..." |
 | C8 | No hallucinated citations | Content | Invented DOIs, ISBNs, sources |
-| C9 | No AI vocabulary | Language | Additionally, comprehensive, notably |
+| C9 | No AI vocabulary | Language | Actually, Additionally, comprehensive, notably |
 | C10 | No copula avoidance | Language | serves as, stands as, boasts |
-| C11 | No negative parallelisms | Language | Not just...but..., Not merely...it's |
+| C11 | No negative parallelisms or tailing negations | Language | Not just...but..., "no guessing" tacked on |
 | C12 | No forced rule-of-three | Language | Three abstract nouns in sequence |
 | C13 | No synonym cycling | Language | Rotating referents for same entity |
 | C14 | No false ranges | Language | from X to Y, from A to B |
@@ -533,6 +675,10 @@ If the user requested the piece in a file, use Write/Edit to save it. If they re
 | C33 | No colon-list elision | Structural | Narrative replaced by bulleted lists |
 | C34 | No anthropomorphized research | Structural | Studies suggest, research indicates |
 | C35 | Cross-segment variation | Structural | All sections read identically |
+| C36 | No passive voice hiding / subjectless fragments | Voice/Form | "is preserved automatically", "No config needed." |
+| C37 | No hyphenated word pair overuse (TIER 1) | Voice/Form | third-party, cross-functional, data-driven uniformly hyphenated |
+| C38 | No signposting announcements | Voice/Form | Let's dive in, here's what you need to know |
+| C39 | No fragmented headers | Voice/Form | Header → one-line restatement → real content |
 
 ---
 
@@ -547,14 +693,15 @@ Not every imperfection is an AI tell. The following are NOT reliable signs of AI
 - **Letter-like or epistolary structure** in isolation. Humans write letters.
 - **Use of conjunctions** (Additionally, Furthermore, Moreover) in isolation. One "Additionally" is not a tell; five in the same piece is.
 
-These are noted as ineffective because over-flagging them produces false positives and wastes editing effort on non-issues. Focus on the 35 constraints above, which target patterns that actually distinguish AI output from human writing at scale.
+These are noted as ineffective because over-flagging them produces false positives and wastes editing effort on non-issues. Focus on the 39 constraints above, which target patterns that actually distinguish AI output from human writing at scale.
 
 ---
 
 ## Reference
 
 Primary sources:
-- [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) (February 2026 revision), maintained by WikiProject AI Cleanup. Covers all 8 major categories. Platform-specific patterns (broken wikitext, hallucinated Wikipedia categories/templates, AFC submission statements) omitted as not applicable to general writing.
+- [blader/humanizer](https://github.com/blader/humanizer) v2.5.1 (MIT, Siqi Chen). Upstream 29-pattern catalog. C36-C39 ported directly; C9 ("actually") and C11 (tailing negations) augmented from upstream PRs #80, #79, #72, #42.
+- [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) (April 2026 revision), maintained by WikiProject AI Cleanup. Covers all 8 major categories. Platform-specific patterns (broken wikitext, hallucinated Wikipedia categories/templates, AFC submission statements) omitted as not applicable to general writing.
 - Kobak et al. (2024): Excess word frequency analysis across LLM output vs. human baselines. 329 words with statistically significant overuse; top 10 integrated into C9.
 - Reinhart (PNAS 2025): Noun-to-verb ratio distortion in LLM output. Basis for C32.
 - Tripto et al. (EMNLP 2025): Cross-segment stylistic uniformity and flow-dependent features as detection signals. Basis for C29, C35.
