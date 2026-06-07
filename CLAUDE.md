@@ -12,7 +12,7 @@ If the user requests humanizer-pro by name or trigger phrase ("use humanizer," "
 
 ## Review mode
 
-If the user asks to check existing content for AI patterns ("does this sound AI," "run humanizer on this," "review this against humanizer"), run Phase 4 verification from SKILL.md (Pass 1 pattern scan, Pass 2 structural audit, Pass 3 read-aloud). Report constraint violations with C-number, matched text, and suggested fix. Offer to rewrite flagged sections.
+If the user asks to check existing content for AI patterns ("does this sound AI," "run humanizer on this," "review this against humanizer"), run Phase 4 verification from SKILL.md (Pass 1 density-graded pattern scan, Pass 2 structural audit, Pass 3 self-audit, Pass 4 read-aloud). Report constraint violations with C-number, matched text, and suggested fix. Offer to rewrite flagged sections. When rewriting, thin clusters rather than removing every instance — over-correction produces a sanitized, flat "mean" that is itself a tell (see the Pass 1 calibration in SKILL.md).
 
 ## Recommended operational instructions
 

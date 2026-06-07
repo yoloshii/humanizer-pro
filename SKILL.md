@@ -1,6 +1,6 @@
 ---
 name: humanizer-pro
-version: 2.1.0
+version: 2.2.0
 license: MIT
 compatibility: claude-code opencode
 description: |
@@ -174,6 +174,13 @@ Write the piece with all 39 constraints loaded. Each constraint below includes i
 **Instead:** Use the plainest word that works. "Important" not "crucial." "Show" not "showcase." "Also" not "Additionally." "Thorough" not "comprehensive." "Showed" not "exhibited." Most of these words have simple equivalents. "Actually" almost always means nothing — delete it.
 
 **Note:** "delve" dropped off sharply in 2025 LLM output but remains a strong historical tell. Words like "comprehensive," "notably," "particularly," "within," and "multifaceted" were identified by Kobak et al. (2024) as having the highest excess frequency in LLM output vs. human baselines. Co-occurrence is the real signal: one or two of these words may be coincidence; five in the same piece is not.
+
+**The watch-list ages — track model eras (v2.2.0).** This lexical list drifts by model generation; the *structural* constraints (C3, C11, C12, C36) are far more stable than any word list, so weight them higher and re-baseline this list periodically rather than trusting it forever. Approximate drift:
+- **GPT-4 era (2023–2024):** delve, tapestry, testament, intricate, meticulous, beacon, realm.
+- **GPT-4o era (2024–2025):** align with, fostering, bolstered, robust, dynamic, multifaceted, leverage, harness, paradigm, synergy.
+- **GPT-5 era (2025+):** emphasizing, enhance, highlighting, showcasing, streamline, utilize, interplay, ecosystem, framework, vibrant.
+
+Most are already killed above or by C1/C3/C32. Net additions to watch — **context-dependent**, kill in figurative/gravitas use but allow in genuine technical use (e.g. "software framework", "dynamic programming", "Spark ecosystem"): streamline, utilize, harness, paradigm, synergy, bolstered, ecosystem, framework, dynamic.
 
 #### C10. No Copula Avoidance
 
@@ -567,6 +574,17 @@ from\s+.{5,30}\s+to\s+.{5,30},\s+from\s+
 # Notability puffing (C2)
 (active social media presence|profiled in|media outlets)
 ```
+
+### Pass 1 calibration: grade by density, then thin — don't shave
+
+A raw grep hit is a flag, not an automatic delete. Two rules turn the match list into proportional action.
+
+**Grade by density, not mere presence.** The tell is co-occurrence, not any single word (see the C9 note; Kobak et al. 2024). Score each pattern by frequency per 1000 words and by position, then rewrite worst-first:
+- **HIGH** — any Tier-1 pattern; OR any pattern at >1 per 1000 words; OR ≥3 tells clustered in one paragraph; OR any tell in the opening/closing paragraph or an abstract/intro (openings are read first and weighted hardest).
+- **MED** — ~1 per 2000 words; OR 2 tells in one paragraph.
+- **LOW** — isolated, rare, outside openings. Legitimate in some contexts (Tier 3) — flag, don't reflexively rewrite.
+
+**Thin the cluster, don't shave every word.** Over-correction is its own failure mode: strip *every* instance of *every* pattern and the prose collapses into a flat, sanitized "regression-to-the-mean" voice that reads just as artificial as the slop you started from. When a paragraph carries six tells, removing three usually restores a human cadence; removing all six produces a different, equally-detectable flatness. Leave enough variety — one em dash within the C15 cap, an occasional real rule-of-three, a single "however" — that the result reads like a specific person, not a scrubbed average. This bites hardest in **review/rewrite mode** (editing existing text rather than composing fresh): there the deepest diagnostic is not "does this sound fancy?" but "were concrete specifics — names, numbers, dates — available and laundered into generic abstraction?" Restore the specifics (Phase 3C) before you sand the surface.
 
 ### Pass 2: Structural audit
 

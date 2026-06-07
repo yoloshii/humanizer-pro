@@ -15,7 +15,7 @@ Five phases run in sequence:
 1. **Calibration** locks the voice profile (register, perspective, stance, audience) before any writing begins. Optionally calibrates from a writing sample to mirror the user's existing voice.
 2. **Composition** applies all 39 constraints as active rules. Each sentence is shaped by them during generation, not checked against them afterward.
 3. **Voice injection** adds the things constraint-following alone can't produce: sentence rhythm variation, opinion insertion, concrete specifics, deliberate imperfection.
-4. **Verification** runs four passes: a grep-based pattern scan for known AI tells, a structural audit (sentence length variance, paragraph openers, confidence variation, noun-verb ratio), an introspective self-audit ("what makes this still sound AI?"), and a read-aloud test.
+4. **Verification** runs four passes: a grep-based pattern scan for known AI tells (graded HIGH/MED/LOW by density and position, not mere presence), a structural audit (sentence length variance, paragraph openers, confidence variation, noun-verb ratio), an introspective self-audit ("what makes this still sound AI?"), and a read-aloud test. A calibration rule keeps editing proportional: thin clusters rather than scrubbing every instance, because over-correction collapses prose into a flat, equally-detectable "mean."
 5. **Final output** delivers clean text with no meta-commentary about the process.
 
 ## The 39 constraints
@@ -43,13 +43,13 @@ Seven categories. Priority-tiered so the model knows where to spend attention.
 Clone or copy `SKILL.md` into your framework's skill directory. The file is self-contained with standard SKILL.md frontmatter.
 
 ```bash
-git clone https://github.com/OWNER/humanizer-pro.git /path/to/your/skills/humanizer-pro
+git clone https://github.com/yoloshii/humanizer-pro.git /path/to/your/skills/humanizer-pro
 ```
 
 ### Claude Code
 
 ```bash
-git clone https://github.com/OWNER/humanizer-pro.git ~/.claude/skills/humanizer-pro
+git clone https://github.com/yoloshii/humanizer-pro.git ~/.claude/skills/humanizer-pro
 ```
 
 Or upload `SKILL.md` via the Claude web UI at Settings > Capabilities > Skills > Add. The frontmatter uses the compatible format (space-delimited `allowed-tools` string, `version` under `metadata:`).
@@ -103,6 +103,14 @@ The constraint set draws from eight primary sources:
 - Yakura et al. (2024). Cultural feedback loop words amplified by RLHF. Integrated into C9.
 - lmmx AI Tells Rubric. Community catalog of 30+ epistemic tells. Basis for C30, C33, C34.
 - Dentella & Wang (EMNLP 2025). Register rigidity in LLM output. Supporting evidence for C35.
+
+## Changelog
+
+### v2.2.0
+
+- **Density-graded Pass 1.** Pattern-scan hits are scored HIGH/MED/LOW by frequency-per-1000-words and position (openings weighted hardest) and rewritten worst-first — operationalizing the co-occurrence principle the skill already states.
+- **"Thin, don't shave" calibration.** An explicit guard against over-correction: stripping every tell collapses prose into a sanitized regression-to-the-mean voice that is itself a tell. Bites hardest in review/rewrite mode. Converging evidence from community (kambleakash0/english-humanizer) and academic (pedrohcgs detect-only `/humanize`) skills.
+- **Era-versioned C9 vocabulary.** The AI-vocabulary note is annotated by model era (GPT-4 / GPT-4o / GPT-5), with the principle that structural constraints (C3, C11, C12, C36) outlast lexical ones and the word list needs periodic re-baselining; adds context-dependent watch-words (streamline, utilize, harness, paradigm, synergy, bolstered).
 
 ## License
 
