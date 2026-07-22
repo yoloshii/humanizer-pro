@@ -1,10 +1,10 @@
 ---
 name: humanizer-pro
-version: 2.2.0
+version: 2.3.0
 license: MIT
 compatibility: claude-code opencode
 description: |
-  Generates human-sounding text from scratch using 39 anti-AI-pattern constraints applied during composition. Use when writing reports, analyses, articles, feedback documents, essays, documentation, blog posts, or any substantial text where AI detection is a concern. Also use when user says "write this like a human," "make it sound natural," "no AI slop," or "use humanizer." Handles voice calibration (including writing-sample matching), constraint-driven composition, rhythm variation, opinion injection, specificity passes, and four-pass automated verification (pattern scan, structural audit, self-audit, read-aloud). Aligned with Wikipedia:Signs of AI writing (April 2026 revision), upstream blader/humanizer 2.5.1, and peer-reviewed stylometric research (2024-2026).
+  Generates human-sounding text from scratch using 44 anti-AI-pattern constraints applied during composition, and edits existing drafts without flattening the author's voice. Use when writing reports, analyses, articles, feedback documents, essays, documentation, blog posts, or any substantial text where AI detection is a concern. Also use when user says "write this like a human," "make it sound natural," "no AI slop," or "use humanizer." Handles voice calibration (including writing-sample matching), constraint-driven composition, rhythm variation, opinion injection, specificity passes, a preservation mode for editing someone else's draft, and four-pass automated verification (pattern scan, structural audit, self-audit, read-aloud). Aligned with Wikipedia:Signs of AI writing (April 2026 revision), upstream blader/humanizer 2.5.1, petergyang/no-ai-slop, and peer-reviewed stylometric research (2024-2026).
 allowed-tools:
   - Read
   - Write
@@ -19,11 +19,13 @@ allowed-tools:
 ## Quick start
 
 1. Determine voice profile (register, perspective, stance, audience). Optionally calibrate from a writing sample (Phase 1A.5).
-2. Load 39 anti-pattern constraints as active composition rules
+2. Load 44 anti-pattern constraints as active composition rules
 3. Write the piece with constraints applied per-sentence
 4. Inject voice: vary rhythm, insert opinions, add specifics, allow imperfection
 5. Run four-pass verification: pattern scan (Grep), structural audit, self-audit, read-aloud test
 6. Output clean text with no meta-commentary
+
+**Editing someone else's draft instead of composing?** Go to Phase 2.5. The constraints still apply, but the author's voice outranks them, and the output contract changes.
 
 ## When to use
 
@@ -51,7 +53,7 @@ Lock these before writing. If the user hasn't specified, infer from context. A f
 
 ### 1B. Load anti-pattern constraints
 
-These 39 constraints are active during composition. They are not a checklist to run afterward. They shape every sentence as you write it.
+These 44 constraints are active during composition. They are not a checklist to run afterward. They shape every sentence as you write it.
 
 Memorize the constraint categories:
 - **Content (1-8)**: What you say and how you source it
@@ -61,12 +63,13 @@ Memorize the constraint categories:
 - **Filler/Hedging (26-28)**: Verbal padding
 - **Epistemic/Structural (29-35)**: How you think and organize on the page
 - **Voice/Form (36-39)**: Specific surface tells from upstream consensus (passive voice, hyphenated pairs, signposting, fragmented headers)
+- **Rhetorical staging and register (40-44)**: Manufactured drama and hype vocabulary (faux-insight setups, colon reveals, staged questions, kickers, empty intensifiers)
 
 Not all constraints carry equal weight. During composition, allocate attention by priority:
 
-- **Tier 1 (instant tells, always rewrite)**: C1, C9, C15, C21, C23, C24, C26, C34, C37. A single hit from any of these is enough to flag a piece. These are the patterns detectors and human reviewers catch first.
-- **Tier 2 (strong signals, rewrite on sight)**: C3, C4, C10, C12, C28, C32, C33, C36, C38. One instance may pass; two in the same piece is a pattern.
-- **Tier 3 (contextual, check before rewriting)**: C2, C5, C7, C8, C11, C13, C14, C20, C22, C25, C27. These are legitimate in some contexts. Flag them, but don't blindly rewrite.
+- **Tier 1 (instant tells, always rewrite)**: C1, C9, C15, C21, C23, C24, C26, C34, C37, C43. A single hit from any of these is enough to flag a piece. These are the patterns detectors and human reviewers catch first.
+- **Tier 2 (strong signals, rewrite on sight)**: C3, C4, C10, C12, C28, C32, C33, C36, C38, C40, C41, C42. One instance may pass; two in the same piece is a pattern.
+- **Tier 3 (contextual, check before rewriting)**: C2, C5, C7, C8, C11, C13, C14, C20, C22, C25, C27, C44. These are legitimate in some contexts. Flag them, but don't blindly rewrite.
 - **Tier 4 (holistic, assess in structural audit)**: C6, C16, C17, C18, C19, C29, C30, C31, C35, C39. These can't be caught per-sentence. Evaluate at the draft level in Pass 2.
 
 **Instruction-layer note:** These instructions use structured lists, bold labels, tables, colon-prefixed items, and uniformly authoritative tone. This formatting is optimized for LLM instruction parsing. Do not replicate it in output. The constraints below govern what you write for the user, not how these instructions are formatted.
@@ -101,7 +104,7 @@ Write a throwaway opening sentence that is deliberately short. Under 8 words. Th
 
 ## Phase 2: Composition (active constraints)
 
-Write the piece with all 39 constraints loaded. Each constraint below includes its trigger patterns and what to do instead.
+Write the piece with all 44 constraints loaded. Each constraint below includes its trigger patterns and what to do instead.
 
 ### Content constraints
 
@@ -181,6 +184,14 @@ Write the piece with all 39 constraints loaded. Each constraint below includes i
 - **GPT-5 era (2025+):** emphasizing, enhance, highlighting, showcasing, streamline, utilize, interplay, ecosystem, framework, vibrant.
 
 Most are already killed above or by C1/C3/C32. Net additions to watch — **context-dependent**, kill in figurative/gravitas use but allow in genuine technical use (e.g. "software framework", "dynamic programming", "Spark ecosystem"): streamline, utilize, harness, paradigm, synergy, bolstered, ecosystem, framework, dynamic.
+
+**Hype/marketing register (v2.3.0).** The list above skews encyclopedic-academic, because its sources are Wikipedia and Kobak et al. Marketing copy, landing pages, and launch posts fail in a different register, and the words that give them away barely overlap. Kill in promotional use:
+
+empower, supercharge, elevate, embark, transformative, paramount, ever-evolving, facilitate, game changer, game-changing, unlock (figurative), unleash, revolutionize, seamless, effortless, next-level
+
+Also kill the stock reaction phrases that pad launch copy: "this is huge", "this changes everything", "let that sink in".
+
+Same context rule as the era list: these are dead in figurative or gravitas use, fine in literal use. "Unlock the door" is a door. "Facilitate the workshop" is a real job description. "Unlock unprecedented growth" is slop. When you reach for one of these words, name the actual effect instead — what specifically got faster, cheaper, or possible that wasn't before.
 
 #### C10. No Copula Avoidance
 
@@ -303,12 +314,29 @@ Most are already killed above or by C1/C3/C32. Net additions to watch — **cont
 | It bears mentioning | (delete; start with the content) |
 | Navigating the complexities of | (delete; say what the complexities are) |
 | It is fascinating to note | (delete) |
+| When it comes to | (delete; start with the subject) |
+| In terms of | (delete, or name the actual dimension) |
+| With regard to / With respect to | About, or (delete) |
+| In today's world / In the age of / In the world of | (delete; date the claim if it needs dating) |
+| The reality is / The truth is | (delete; state the claim) |
+| Going forward | (delete, or give the actual date/trigger) |
+| In this article / In this post | (delete; C38 territory) |
 
 **Note:** "It's important to note" and "worth noting" were among the strongest AI tells in 2022-2024. They appear less often in 2025+ model output but remain worth catching.
+
+**Note on the openers:** "When it comes to X" and "In terms of X" are near-pure filler — the sentence almost always works with the phrase deleted and X promoted to subject. "When it comes to pricing, we're competitive" becomes "Our pricing is competitive." The "In today's world" family additionally dates a claim without committing to a date; if the timeframe matters, name it.
 
 #### C27. No Excessive Hedging
 
 **Rule:** One hedge per claim maximum. "This may affect outcomes" is fine. "This could potentially possibly be argued to have some effect" is four hedges on one verb.
+
+**Carve-out — this constraint caps stacking, it does not ban hedges.** A single hedge that carries real doubt, softens a request, or reproduces how the writer speaks is doing work, and C29 (vary your confidence) actively wants it there. Reduce a stack to one hedge. Never take the last one.
+
+- ✅ "I think the second approach is better, but I haven't tested it." (one hedge, real uncertainty)
+- ✅ "Maybe worth checking before we ship." (softening, spoken register)
+- ❌ "It could potentially possibly be argued that this might have some effect." (five hedges, zero content)
+
+This carve-out is load-bearing in preservation mode (Phase 2.5), where stripping an author's honest "I'm not sure" is the most common way an edit destroys their voice while passing every other check.
 
 #### C28. No Generic Positive Endings
 
@@ -432,6 +460,118 @@ Most are already killed above or by C1/C3/C32. Net additions to watch — **cont
 
 **Instead:** Cut the warm-up line. Start directly with the substantive content. If the header is "Performance", the reader does not need a sentence telling them performance is important — get to the point.
 
+### Rhetorical staging and register constraints
+
+C40 through C43 target one shared move: staging a reveal instead of making a claim. The writer builds a small frame — withheld knowledge, a suspenseful colon, a question they already answered, a closing aphorism — and the frame does the work the content should have done. Models produce these constantly because the shape is satisfying to generate and costs nothing to fill. C44 covers the register-level version of the same instinct.
+
+#### C40. No Faux-Insight Setups
+
+**Kill on sight:** What most people get wrong, Here's what nobody tells you, The part everyone misses, This is the part most people skip, What they don't tell you, The thing nobody talks about, Most people think X — they're wrong, Everyone focuses on X, but
+
+**Problem:** These position the writer as the sole holder of a truth the reader's peers missed. The flattery is aimed at the writer, not the reader, and the claim that follows is almost always ordinary. The setup inflates the payload by implying suppressed knowledge that does not exist.
+
+**Before:**
+> The part everyone misses: distribution is the real moat.
+
+**After:**
+> Distribution is the moat.
+
+**Instead:** Cut the setup and let the claim carry itself. A good claim does not need to be smuggled in as forbidden knowledge. If it collapses without the frame, it was not worth the sentence.
+
+#### C41. No Colon Reveals
+
+**Kill on sight:** A noun phrase, a colon, then a lowercase dramatic completion. "The detail that makes it work: a separate agent grades it." "The best part: it learns." "The catch: it only runs offline." "One problem: nobody asked for it."
+
+**Problem:** The colon manufactures a beat of suspense the content has not earned. Distinct from C33 (colon-list elision, where narrative gets replaced by bullets) and C17 (`**Label:** content` bullet headers) — this one lives inside running prose and reads as copywriting cadence dropped into an essay.
+
+**Before:**
+> The detail that makes it work: a separate agent grades it.
+
+**After:**
+> A separate agent does the grading, which is what makes it work.
+
+**Instead:** Rewrite as a plain sentence. Keep colons for lists, labels, and quotations. Where a colon is genuinely right, prefer sentence case after it unless grammar, a proper noun, a title, or code requires otherwise.
+
+#### C42. No Rhetorical Setups or Self-Answered Questions
+
+**Kill on sight:** What if I told you, Think about it:, Plot twist:, Here's a thought:, Ask yourself:, Sound familiar?, and any question posed only to be answered in the next sentence ("So what changed? Everything.").
+
+**Problem:** The question is not a question. The writer already has the answer and is staging a beat of theatre to deliver it. Self-answered pairs are especially common in model output because they let the model produce structure in place of content.
+
+**Before:**
+> So why did adoption stall? The pricing.
+
+**After:**
+> Adoption stalled because of the pricing.
+
+**Instead:** Make the statement. Keep a question only when you are genuinely leaving it open, or when you are asking the reader something you do not then answer for them.
+
+#### C43. No Fake-Profound Kickers (TIER 1)
+
+**Kill on sight:** A closing line that converts the piece's point into a metaphor, aphorism, or mic-drop. "The future was never the model. It was the eval." "Sometimes the simplest tool is the sharpest one." "And that, more than anything, is the real shift."
+
+**Problem:** The kicker trades a concrete ending for a quotable one. It is the most reliably AI-shaped sentence in a piece, because models are trained toward satisfying closure and a final flourish always scores well. Distinct from C28 (generic positive endings), which is optimism without content; a kicker has cadence and manufactured depth. Tier 1 because it sits in the closing paragraph, which Pass 1 calibration already weights hardest, and because a single one flags the whole piece.
+
+**Handling — delete, do not improve.** Do not rewrite the kicker into a better metaphor. Do not preserve its rhythm with a substitute line. Delete it outright, then end on the clearest concrete sentence already in the draft. If the piece genuinely lacks closure after the deletion, add a plain takeaway or a next action, never a flourish.
+
+**Before:**
+> Teams that measure their evals ship faster. In the end, what you measure is what you become.
+
+**After:**
+> Teams that measure their evals ship faster.
+
+#### C44. No Empty Intensifiers
+
+**Kill when empty:** just, simply, literally, truly, actually, honestly, really, basically, essentially, fundamentally, importantly, crucially, inherently, inevitably, clearly, obviously, undoubtedly, certainly
+
+**Problem:** These get inserted to add weight and instead advertise that the sentence lacked it. "This is simply the fastest option" is weaker than "This is the fastest option." Stacked, they are a strong tell: "this is just fundamentally a better approach" carries three empty words and one real one.
+
+**Keep when load-bearing.** Unlike most constraints here, this one is conditional by design. Keep the adverb when it carries genuine emphasis, real uncertainty, an actual contrast, or the writer's spoken rhythm.
+
+- ✅ "I just wanted to check." (softening, spoken register)
+- ✅ "It literally caught fire." (literal, not intensifying)
+- ✅ "Honestly, I don't know." (real admission)
+- ✅ "The API is fast. The SDK, obviously, is not." (contrast)
+- ❌ "This is just fundamentally a better approach."
+- ❌ "It's literally the best tool available."
+
+**Test:** Delete the word and read the sentence. If nothing was lost, leave it deleted. If the meaning shifted or the writer's voice went flat, put it back. In preservation mode (Phase 2.5) the presumption flips toward keeping.
+
+---
+
+## Phase 2.5: Preservation mode (editing an existing draft)
+
+Phases 1 through 3 assume you are composing. When the input is someone else's finished draft, the job inverts. The constraints still apply, but **the author's voice outranks them**. A clean rewrite that no longer sounds like the author is a failure even when every constraint passes.
+
+**The rule: minimum effective edit.** Remove the AI patterns. Leave everything else alone. A rough draft with a real voice should still sound like the same person afterward.
+
+**Protect these, even when a constraint flags them:**
+
+| Surface | Why it survives |
+|---|---|
+| Hedges carrying real uncertainty — "I think", "maybe", "to be honest", "I'm not sure but" | C27 caps stacking, not hedging. C29 actively wants this variation. See the C27 carve-out. |
+| Profanity, bluntness, strong opinions | Edge is voice. Do not upgrade it to professional register. |
+| Digressions, asides, self-interruptions | C31 and Phase 3D want these. A real tangent outranks a tidy structure. |
+| Fragments and long spoken sentences that are clear | C36 targets subjectless *ad-copy* fragments, not a writer's cadence. |
+| Repeated vocabulary the author actually uses | C13 forbids synonym cycling; it does not license promoting "stuff" to "components". |
+| Uneven polish across sections | C35 wants variation. Do not make every paragraph equally tidy. |
+| Empty-looking intensifiers in dialogue or spoken-register prose | C44's presumption flips here. Delete only what is clearly dead. |
+
+**Order of operations: restore specifics before sanding surface.** When editing existing text, the deepest failure is usually not that the prose is fancy — it is that concrete detail (names, numbers, dates, mechanisms) was laundered into abstraction somewhere upstream. Run the Phase 3C specificity pass first, then the pattern passes. Combine this with the Pass 1 calibration: thin clusters, do not shave every instance.
+
+**Output contract — this is the one place Phase 5 is suspended.** When the user handed you their draft, return the edited text **plus a short "What changed" list**. They need to be able to reject an individual edit, which requires seeing it. Keep the list short and specific: what you removed, and why in a few words. Phase 5's no-meta-commentary rule governs composition, not editing.
+
+**Detect-only requests.** If the user asks whether a piece reads as AI *without* asking for a rewrite, do exactly that and stop:
+
+- Name each constraint that fires, with its C-number.
+- Quote the line it fired on.
+- Give the fix in a few words.
+- Do **not** rewrite the draft.
+- Do **not** score it, rate it, or give a percentage.
+- Do **not** estimate whether a model wrote it. Detectors guess; a named pattern is evidence the user can check themselves. That distinction is the whole value of the report.
+
+Offer the rewrite afterward.
+
 ---
 
 ## Phase 3: Voice injection (during and after composition)
@@ -545,7 +685,27 @@ Run these grep patterns against the draft. Any hit requires a rewrite of that se
 # Em dashes (C15) -- TIER 1: most visible structural tell in 2026
 —
  --
+
+# Faux-insight setups (C40)
+(what most people get wrong|nobody tells you|the part everyone misses|most people skip|what they don't tell you|the thing nobody talks about)
+
+# Rhetorical setups (C42)
+(what if I told you|think about it:|plot twist:|here's a thought:|ask yourself:|sound familiar\?)
+
+# Fake-profound kickers (C43) -- TIER 1: check the FINAL paragraph specifically
+(in the end,|at the end of it all|and that,? more than anything|what you measure is what you|the real .{0,20} was never)
+
+# Hype/marketing register (C9 v2.3.0)
+\b(empower|supercharge|elevate|embark|transformative|paramount|ever-evolving|game.?chang(er|ing)|unleash|revolutioniz|seamless|effortless|next-level)\b
+(this is huge|this changes everything|let that sink in)
+
+# Filler openers (C26 v2.3.0)
+(when it comes to|in terms of|with regard to|with respect to|in today's world|in the age of|in the world of|the reality is|the truth is|going forward|in this article|in this post)
 ```
+
+**Positional note for C43.** Kickers only appear in closing position. Do not grep the whole draft for them — read the final paragraph of the piece and of each major section, and ask whether the last sentence states a fact or performs a flourish. The regex above catches common phrasings; the pattern itself is structural and the regex will miss most instances.
+
+**Context-gate C41 and C44.** Neither has a usable regex. C41 (colon reveals) requires distinguishing a dramatic reveal from a legitimate list or label — grep every `: ` and you will drown in false positives. C44 (empty intensifiers) is conditional by design; a raw match tells you nothing about whether the word is load-bearing. Catch both by reading, in Pass 2.
 
 **Medium-confidence (review, may be legitimate):**
 
@@ -652,9 +812,11 @@ If the user requested the piece in a file, use Write/Edit to save it. If they re
 - If verification caught problems, fix them silently
 - If you have genuine uncertainty about tone or scope, ask the user before writing (Phase 1), not after
 
+**Exception — preservation mode.** This section governs composition. When you edited a draft the user handed you, Phase 2.5 applies instead: return the edited text plus a short "What changed" list, so the user can reject an individual edit.
+
 ---
 
-## Quick reference: the 39 constraints
+## Quick reference: the 44 constraints
 
 | # | Constraint | Category | Trigger |
 |---|-----------|----------|---------|
@@ -697,6 +859,11 @@ If the user requested the piece in a file, use Write/Edit to save it. If they re
 | C37 | No hyphenated word pair overuse (TIER 1) | Voice/Form | third-party, cross-functional, data-driven uniformly hyphenated |
 | C38 | No signposting announcements | Voice/Form | Let's dive in, here's what you need to know |
 | C39 | No fragmented headers | Voice/Form | Header → one-line restatement → real content |
+| C40 | No faux-insight setups | Rhetorical staging | What nobody tells you, the part everyone misses |
+| C41 | No colon reveals | Rhetorical staging | "The best part: it learns." |
+| C42 | No rhetorical setups / self-answered questions | Rhetorical staging | What if I told you, Plot twist:, "So why? Pricing." |
+| C43 | No fake-profound kickers (TIER 1) | Rhetorical staging | Closing metaphor or aphorism. Delete, don't improve. |
+| C44 | No empty intensifiers | Register | just, simply, literally, truly, obviously (when empty) |
 
 ---
 
@@ -711,7 +878,7 @@ Not every imperfection is an AI tell. The following are NOT reliable signs of AI
 - **Letter-like or epistolary structure** in isolation. Humans write letters.
 - **Use of conjunctions** (Additionally, Furthermore, Moreover) in isolation. One "Additionally" is not a tell; five in the same piece is.
 
-These are noted as ineffective because over-flagging them produces false positives and wastes editing effort on non-issues. Focus on the 39 constraints above, which target patterns that actually distinguish AI output from human writing at scale.
+These are noted as ineffective because over-flagging them produces false positives and wastes editing effort on non-issues. Focus on the 44 constraints above, which target patterns that actually distinguish AI output from human writing at scale.
 
 ---
 
@@ -719,6 +886,7 @@ These are noted as ineffective because over-flagging them produces false positiv
 
 Primary sources:
 - [blader/humanizer](https://github.com/blader/humanizer) v2.5.1 (MIT, Siqi Chen). Upstream 29-pattern catalog. C36-C39 ported directly; C9 ("actually") and C11 (tailing negations) augmented from upstream PRs #80, #79, #72, #42.
+- [petergyang/no-ai-slop](https://github.com/petergyang/no-ai-slop) (MIT, Peter Yang), commit `61c21c3`, July 2026. An editing-mode skill whose organizing principle is voice preservation. C40-C43 derived from its pattern catalog (faux-insight setups, colon reveals, rhetorical setups, fake-profound kickers), C44 from its often-empty-adverb list, and the C9/C26 hype-register extensions from its banned-word and filler-phrase lists. Phase 2.5 preservation mode and the detect-only doctrine (name the pattern, quote the line, never score or claim AI authorship) are adapted from its editing principles and eval checks.
 - [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) (April 2026 revision), maintained by WikiProject AI Cleanup. Covers all 8 major categories. Platform-specific patterns (broken wikitext, hallucinated Wikipedia categories/templates, AFC submission statements) omitted as not applicable to general writing.
 - Kobak et al. (2024): Excess word frequency analysis across LLM output vs. human baselines. 329 words with statistically significant overuse; top 10 integrated into C9.
 - Reinhart (PNAS 2025): Noun-to-verb ratio distortion in LLM output. Basis for C32.

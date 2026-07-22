@@ -1,40 +1,46 @@
 # humanizer-pro
 
-Agent skill. 39 constraints for writing text that doesn't read like AI output. Composition-time rules, not post-hoc editing. Works with any agentic framework that supports SKILL.md.
+Agent skill. 44 constraints for writing text that doesn't read like AI output. Composition-time rules first, with a preservation mode for editing drafts you didn't write. Works with any agentic framework that supports SKILL.md.
 
 ## What it does
 
 Most "humanizer" tools work backward: you write with an LLM, then run the output through a filter that swaps words and restructures sentences. The result still reads like processed AI text, just with different vocabulary.
 
-This skill works forward. It loads 39 constraints before writing starts and applies them per-sentence during composition. The output is written human from the first draft, not cleaned up after the fact.
+This skill works forward. It loads 44 constraints before writing starts and applies them per-sentence during composition. The output is written human from the first draft, not cleaned up after the fact.
+
+When the input is an existing draft rather than a writing task, preservation mode inverts the priority: the constraints still apply, but the author's voice outranks them.
 
 ## How it works
 
 Five phases run in sequence:
 
 1. **Calibration** locks the voice profile (register, perspective, stance, audience) before any writing begins. Optionally calibrates from a writing sample to mirror the user's existing voice.
-2. **Composition** applies all 39 constraints as active rules. Each sentence is shaped by them during generation, not checked against them afterward.
+2. **Composition** applies all 44 constraints as active rules. Each sentence is shaped by them during generation, not checked against them afterward.
 3. **Voice injection** adds the things constraint-following alone can't produce: sentence rhythm variation, opinion insertion, concrete specifics, deliberate imperfection.
 4. **Verification** runs four passes: a grep-based pattern scan for known AI tells (graded HIGH/MED/LOW by density and position, not mere presence), a structural audit (sentence length variance, paragraph openers, confidence variation, noun-verb ratio), an introspective self-audit ("what makes this still sound AI?"), and a read-aloud test. A calibration rule keeps editing proportional: thin clusters rather than scrubbing every instance, because over-correction collapses prose into a flat, equally-detectable "mean."
 5. **Final output** delivers clean text with no meta-commentary about the process.
 
-## The 39 constraints
+**Phase 2.5 (preservation mode)** replaces phases 1-3 when you hand the skill a draft to fix instead of a piece to write. It makes the minimum effective edit, protects hedges and profanity and digressions that carry the author's voice, restores laundered specifics before sanding surface patterns, and returns the edited text plus a short "What changed" list so you can reject any individual edit. Detect-only requests get a report and no rewrite: each constraint that fired, the line it fired on, and the fix. Never a score, and never a guess about whether a model wrote it.
 
-Seven categories. Priority-tiered so the model knows where to spend attention.
+## The 44 constraints
+
+Eight categories. Priority-tiered so the model knows where to spend attention.
 
 **Content (C1-C8):** No significance inflation, notability puffing, participial filler, promotional tone or persuasive authority tropes, vague attributions, formulaic sections, title-as-proper-noun openings, or hallucinated citations.
 
-**Language (C9-C14):** No AI vocabulary words (33-word kill list drawn from Kobak et al.'s excess frequency analysis, plus "actually"), copula avoidance, negative parallelisms or tailing negations, forced rule-of-three, synonym cycling, or false ranges.
+**Language (C9-C14):** No AI vocabulary words (33-word kill list drawn from Kobak et al.'s excess frequency analysis, plus "actually", plus a hype/marketing register list for promotional copy), copula avoidance, negative parallelisms or tailing negations, forced rule-of-three, synonym cycling, or false ranges.
 
 **Style (C15-C20):** Em dash discipline (max 1 per 500 words), boldface restraint, no inline-header lists, sentence case headings, no emojis, no unnecessary tables.
 
 **Communication (C21-C25):** No chatbot artifacts, knowledge-cutoff disclaimers, sycophancy, chatbot tracking artifacts (utm_source, oaicite, citeturn), and straight quotes only.
 
-**Filler/Hedging (C26-C28):** No filler phrases (13-entry kill-and-replace map), no hedging stacks, no generic positive endings.
+**Filler/Hedging (C26-C28):** No filler phrases (22-entry kill-and-replace map), no hedging stacks, no generic positive endings. C27 caps stacking rather than banning hedges, so a single hedge carrying real doubt survives.
 
 **Epistemic/Structural (C29-C35):** Vary confidence levels across claims, write from a situated perspective instead of an omniscient one, vary sentence predictability (burstiness), favor verbs over nominalizations, don't replace narrative with bulleted lists, name researchers instead of anthropomorphizing research, and vary style across sections of long pieces.
 
 **Voice/Form (C36-C39):** No passive voice that hides the actor or subjectless ad-copy fragments, no uniform hyphenation across common compound modifiers (third-party, cross-functional, data-driven), no pedagogical signposting ("Let's dive in"), no fragmented headers (header → restating one-liner → real content).
+
+**Rhetorical staging and register (C40-C44):** No faux-insight setups ("what nobody tells you"), no colon reveals ("The best part: it learns"), no rhetorical setups or self-answered questions ("So why did it fail? Pricing."), no fake-profound kickers (the closing aphorism, which gets deleted rather than rewritten into a better metaphor), no empty intensifiers (just, simply, literally, obviously, kept when they carry emphasis, contrast, or spoken rhythm).
 
 ## Installation
 
@@ -83,8 +89,9 @@ The popular [humanizer](https://github.com/blader/humanizer) skill (MIT, Siqi Ch
 This skill has three differences:
 
 1. Constraints are applied during composition, not after. The model doesn't write freely and then self-edit. It writes with the constraints loaded as active rules from the first word.
-2. 39 constraints instead of 29. The additional 10 come from peer-reviewed stylometric research published in 2024-2025 (noun-verb ratio distortion, burstiness deficit, cross-segment uniformity, register rigidity), the lmmx AI Tells Rubric (view from nowhere, uniform confidence, anthropomorphized research, colon-list elision), and original constraints (title-as-proper-noun openings, hallucinated citations, unnecessary tables, chatbot tracking artifacts). C36-C39 are ported from upstream blader/humanizer 2.5.1 (passive voice, hyphenated word pair overuse, signposting announcements, fragmented headers).
-3. Four-pass verification catches anything that slipped through composition. The grep patterns cover 18+ pattern groups. The structural audit checks 10 properties. The self-audit asks the holistic "what still smells AI?" question. The read-aloud test catches what the others miss.
+2. 44 constraints instead of 29. Ten come from peer-reviewed stylometric research published in 2024-2025 (noun-verb ratio distortion, burstiness deficit, cross-segment uniformity, register rigidity), the lmmx AI Tells Rubric (view from nowhere, uniform confidence, anthropomorphized research, colon-list elision), and original constraints (title-as-proper-noun openings, hallucinated citations, unnecessary tables, chatbot tracking artifacts). C36-C39 are ported from upstream blader/humanizer 2.5.1 (passive voice, hyphenated word pair overuse, signposting announcements, fragmented headers). C40-C44 are derived from petergyang/no-ai-slop (faux-insight setups, colon reveals, rhetorical setups, fake-profound kickers, empty intensifiers), whose catalog covers rhetorical staging patterns the encyclopedic sources miss.
+3. Four-pass verification catches anything that slipped through composition. The grep patterns cover 23+ pattern groups. The structural audit checks 10 properties. The self-audit asks the holistic "what still smells AI?" question. The read-aloud test catches what the others miss.
+4. A preservation mode for editing text you didn't write. The composition constraints assume you control every sentence. When the input is someone else's draft, that assumption inverts. The author's voice outranks the constraint set, and a technically clean rewrite that no longer sounds like them is a failure.
 
 ## Agent configuration
 
@@ -92,9 +99,10 @@ This skill has three differences:
 
 ## Sources
 
-The constraint set draws from eight primary sources:
+The constraint set draws from ten primary sources:
 
 - [blader/humanizer](https://github.com/blader/humanizer) v2.5.1 (MIT, Siqi Chen). Upstream 29-pattern catalog. Direct port for C36-C39; supplemental augments for C9 ("actually"), C11 (tailing negations), and C4 (persuasive authority tropes).
+- [petergyang/no-ai-slop](https://github.com/petergyang/no-ai-slop) (MIT, Peter Yang), July 2026. Editing-mode skill organized around voice preservation. Basis for C40-C44, the C9 hype-register list, the C26 filler-opener additions, Phase 2.5 preservation mode, and the detect-only doctrine.
 - [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) (April 2026 revision). WikiProject AI Cleanup. Covers 8 major categories. Basis for C1-C8, C10-C13, C15-C21, C23-C26, C28.
 - Kobak et al. (2024). Excess word frequency in LLM output vs. human baselines. 329 statistically overused words. Top 10 integrated into C9.
 - Reinhart (PNAS 2025). Noun-to-verb ratio distortion in LLM text. Basis for C32.
@@ -105,6 +113,16 @@ The constraint set draws from eight primary sources:
 - Dentella & Wang (EMNLP 2025). Register rigidity in LLM output. Supporting evidence for C35.
 
 ## Changelog
+
+### v2.3.0
+
+- **Five new constraints (C40-C44), a new category: rhetorical staging and register.** C40 faux-insight setups ("what nobody tells you"), which flatter the writer rather than the reader. C41 colon reveals ("The best part: it learns"), manufactured suspense in running prose, distinct from C33's colon-list elision and C17's bullet headers. C42 rhetorical setups and self-answered questions ("So why did it fail? Pricing."). C43 fake-profound kickers, promoted straight to Tier 1, because the closing aphorism is the most reliably AI-shaped sentence in a piece; the handling rule is *delete, do not improve*. C44 empty intensifiers, conditional by design: kept when they carry emphasis, contrast, or spoken rhythm.
+- **Phase 2.5 preservation mode.** The composition constraints assume you control every sentence; editing someone else's draft inverts that. Minimum effective edit, an explicit protect-list (hedges carrying real doubt, profanity, digressions, uneven polish, the author's own repeated vocabulary), specificity restored before surface sanded, and an output contract that suspends Phase 5: edited text plus a short "What changed" list, so the user can reject an individual edit.
+- **Detect-only doctrine.** A request to check a draft without rewriting it returns named constraints, quoted lines, and fixes. No score, no percentage, no guess about whether a model wrote it. Detectors guess; a named pattern is evidence the user can verify.
+- **C27 carve-out.** The hedging constraint caps *stacking*, it does not ban hedges. Reduce a stack to one; never take the last one. Resolves a real conflict with C29 (vary your confidence) that previously let a technically-passing edit strip an author's honest uncertainty.
+- **Hype/marketing register added to C9.** The existing list skews encyclopedic-academic because its sources are Wikipedia and Kobak et al. Promotional copy fails in a different register with almost no overlap: empower, supercharge, elevate, transformative, game-changing, unleash, seamless, effortless, plus stock reactions ("this is huge", "this changes everything").
+- **Nine filler openers added to C26**, including the near-pure-filler "when it comes to" and "in terms of", and the undated "in today's world" family.
+- Sources list corrected from "eight" to the actual count.
 
 ### v2.2.0
 
