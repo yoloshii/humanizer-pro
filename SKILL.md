@@ -1,10 +1,10 @@
 ---
 name: humanizer-pro
-version: 2.3.0
+version: 2.4.0
 license: MIT
 compatibility: claude-code opencode
 description: |
-  Generates human-sounding text from scratch using 44 anti-AI-pattern constraints applied during composition, and edits existing drafts without flattening the author's voice. Use when writing reports, analyses, articles, feedback documents, essays, documentation, blog posts, or any substantial text where AI detection is a concern. Also use when user says "write this like a human," "make it sound natural," "no AI slop," or "use humanizer." Handles voice calibration (including writing-sample matching), constraint-driven composition, rhythm variation, opinion injection, specificity passes, a preservation mode for editing someone else's draft, and four-pass automated verification (pattern scan, structural audit, self-audit, read-aloud). Aligned with Wikipedia:Signs of AI writing (April 2026 revision), upstream blader/humanizer 2.5.1, petergyang/no-ai-slop, and peer-reviewed stylometric research (2024-2026).
+  Generates human-sounding text from scratch using 44 anti-AI-pattern constraints applied during composition, and edits existing drafts without flattening the author's voice. Use when writing reports, analyses, articles, feedback documents, essays, documentation, blog posts, or any substantial text where AI detection is a concern. Also use when user says "write this like a human," "make it sound natural," "no AI slop," or "use humanizer." Handles voice calibration (including writing-sample matching), constraint-driven composition, rhythm variation, opinion injection, specificity passes, a preservation mode for editing someone else's draft, a quoted-text guard, substance spot-checks (deletion and inversion tests), and four-pass automated verification (pattern scan, structural audit, self-audit, read-aloud). Aligned with Wikipedia:Signs of AI writing (April 2026 revision), upstream blader/humanizer 2.5.1, petergyang/no-ai-slop, AgriciDaniel/anti-slop, and peer-reviewed stylometric research (2024-2026).
 allowed-tools:
   - Read
   - Write
@@ -105,6 +105,10 @@ Write a throwaway opening sentence that is deliberately short. Under 8 words. Th
 ## Phase 2: Composition (active constraints)
 
 Write the piece with all 44 constraints loaded. Each constraint below includes its trigger patterns and what to do instead.
+
+### Standing rule: quoted text is off-limits
+
+A watched phrase that is quoted, mentioned, or discussed is not a hit. Never rewrite text inside quotation marks or blockquotes, never restyle a title or a proper name, and never flag a pattern the draft is talking about rather than using. A piece about AI writing will legitimately contain half the kill lists in this file; the mention is not the tell. This rule binds every phase: composition, preservation mode, and all four verification passes.
 
 ### Content constraints
 
@@ -211,7 +215,9 @@ Same context rule as the era list: these are dead in figurative or gravitas use,
 **After:**
 > The options come from the selected item without forcing the user to guess.
 
-**Instead:** State the positive claim directly. "The beat adds aggression" not "It's not just about the beat, it's about the aggression." For tailing negations, expand the fragment into a real clause or rewrite as a positive statement.
+**Watch (reversed form):** "X rather than Y" where Y is a straw alternative nobody proposed. "The design prioritizes empirical consolidation rather than ideological purity" contrasts the claim against a position no reader held. The form is legitimate when the negated half corrects a real expectation: "it's not a race condition, it's an off-by-one" carries information because the reader plausibly believed the alternative.
+
+**Instead:** State the positive claim directly. "The beat adds aggression" not "It's not just about the beat, it's about the aggression." For tailing negations, expand the fragment into a real clause or rewrite as a positive statement. For a straw "rather than", drop the negated half and keep the claim.
 
 #### C12. No Rule-of-Three Forcing
 
@@ -235,7 +241,7 @@ Same context rule as the era list: these are dead in figurative or gravitas use,
 
 #### C15. Em Dash Discipline
 
-**Kill on sight:** Em dashes (—), double-hyphen substitutes ( -- ), and any parenthetical dash separator. LLMs use em dashes at 3-10x the rate of human writers. This is the single most visible structural tell in 2026 output. Readers and detectors flag it before vocabulary or tone.
+**Kill on sight:** Em dashes (—), double-hyphen substitutes ( -- ), and any parenthetical dash separator. Many readers in 2026 treat this as a conspicuous tell. That is audience folklore, not a measured property of any document: the only pre-registered corpus measurement (Czuma 2026, 69,632 medRxiv preprints) found em-dash prevalence in Discussion sections roughly tripling after ChatGPT, and its own conclusion is that the em dash is a population-level indicator, not a per-document detector. So the cap below is reader-perception discipline, not an authorship claim: density proves nothing, and readers who believe otherwise will flag the piece anyway.
 
 **Rule:** Maximum one em dash (or double-hyphen substitute) per 500 words. Zero is better. Every time you reach for an em dash, stop and use a period, a comma, or parentheses instead. Rewrite the sentence if needed. Double hyphens in CLI flags (--enable-features) and code are exempt.
 
@@ -293,6 +299,8 @@ Same context rule as the era list: these are dead in figurative or gravitas use,
 
 **Rule:** Use straight quotes (`"..."`) not curly quotes. Check before finalizing. Note: ChatGPT and DeepSeek use curly quotes; Claude and Gemini typically do not, but verify anyway.
 
+**Exemption: verbatim quoted material.** The marks delimiting and inside someone else's quoted text are part of the quotation. Straighten the quotes in your own composition; never restyle a quoted source (standing rule, Phase 2).
+
 ### Filler/hedging constraints
 
 #### C26. No Filler Phrases
@@ -326,11 +334,13 @@ Same context rule as the era list: these are dead in figurative or gravitas use,
 
 **Note on the openers:** "When it comes to X" and "In terms of X" are near-pure filler — the sentence almost always works with the phrase deleted and X promoted to subject. "When it comes to pricing, we're competitive" becomes "Our pricing is competitive." The "In today's world" family additionally dates a claim without committing to a date; if the timeframe matters, name it.
 
+**Human-signals gate (v2.4.0).** Wikipedia's list of observed signals of *human* writing, drawn from 25 years of article text, includes the wordy constructions this table targets: "in order to", "due to the fact that", and kin such as "as a result of". These read AI-adjacent only in stacks; in isolation they are how people actually write, and stripping every instance converges the text toward the generated register rather than away from it. For the wordy-construction rows this gate outranks C26's Tier 1 listing in Phase 1B: thin stacks, keep an isolated instance that matches the writer's cadence, and in preservation mode (Phase 2.5) the presumption flips toward keeping, same as C44. The chatbot-tell rows ("It is important to note that", "Worth noting", "At the end of the day", "It goes without saying") stay kill-always; no human-signals evidence protects those.
+
 #### C27. No Excessive Hedging
 
 **Rule:** One hedge per claim maximum. "This may affect outcomes" is fine. "This could potentially possibly be argued to have some effect" is four hedges on one verb.
 
-**Carve-out — this constraint caps stacking, it does not ban hedges.** A single hedge that carries real doubt, softens a request, or reproduces how the writer speaks is doing work, and C29 (vary your confidence) actively wants it there. Reduce a stack to one hedge. Never take the last one.
+**Carve-out — this constraint caps stacking, it does not ban hedges.** A single hedge that carries real doubt, softens a request, or reproduces how the writer speaks is doing work, and C29 (vary your confidence) actively wants it there. Reduce a stack to one hedge. Never take the last one. And when the claim under the hedge is itself vacuous, cut the claim, not the hedge: deleting only the hedge upgrades empty content to confident empty content.
 
 - ✅ "I think the second approach is better, but I haven't tested it." (one hedge, real uncertainty)
 - ✅ "Maybe worth checking before we ship." (softening, spoken register)
@@ -556,21 +566,27 @@ Phases 1 through 3 assume you are composing. When the input is someone else's fi
 | Repeated vocabulary the author actually uses | C13 forbids synonym cycling; it does not license promoting "stuff" to "components". |
 | Uneven polish across sections | C35 wants variation. Do not make every paragraph equally tidy. |
 | Empty-looking intensifiers in dialogue or spoken-register prose | C44's presumption flips here. Delete only what is clearly dead. |
+| Quoted material | Verbatim quotes are not yours to restyle. A pattern inside a quotation belongs to the quoted speaker, not the draft. See the standing rule in Phase 2. |
 
 **Order of operations: restore specifics before sanding surface.** When editing existing text, the deepest failure is usually not that the prose is fancy — it is that concrete detail (names, numbers, dates, mechanisms) was laundered into abstraction somewhere upstream. Run the Phase 3C specificity pass first, then the pattern passes. Combine this with the Pass 1 calibration: thin clusters, do not shave every instance.
 
 **Output contract — this is the one place Phase 5 is suspended.** When the user handed you their draft, return the edited text **plus a short "What changed" list**. They need to be able to reject an individual edit, which requires seeing it. Keep the list short and specific: what you removed, and why in a few words. Phase 5's no-meta-commentary rule governs composition, not editing.
 
-**Detect-only requests.** If the user asks whether a piece reads as AI *without* asking for a rewrite, do exactly that and stop:
+End the list with a claims audit: **"Claims added: 0."** Any fact, name, number, date, quote, or citation that is not in the source draft and was not supplied by the user counts as added. If the number is not zero, you invented something; remove it before returning the text. An edit pass changes how things are said, never what is claimed.
+
+**Detect-only requests.** If the user asks whether a piece reads as AI *without* asking for a rewrite, produce the report and no rewrite:
 
 - Name each constraint that fires, with its C-number.
 - Quote the line it fired on.
 - Give the fix in a few words.
+- Report substance findings from the Pass 2 spot-check under the test name, not a C-number: quote the span, give the artifact (the named loss for deletion, the written-out negation for inversion), and the fix. A substance finding without its artifact does not go in the report.
+- The report's last section is a short **"Not flagged"** list: patterns present in the draft that you deliberately did not report, each with its reason (quoted or secondhand, register-appropriate for the genre, the writer's own habit, a load-bearing hedge or intensifier). This section is the visible evidence that the false-positive discipline ran; without it, restraint is indistinguishable from a miss.
+- When the author is a non-native English speaker, style-evidenced flags need a *higher* bar, not a lower one. Detectors measurably over-flag English-language-learner writing (Stowe et al., ACL 2026, found the bias compounds for non-White ELL writers while human annotators on the same essays showed no significant demographic bias). Suppress isolated style flags entirely; report a style pattern only as a cluster of three or more independent signals, and say that you applied the stricter bar. Count independence the strict way: signals of *different kinds* in the span. Repeated manifestations of one construction, or several patterns that are all one sentence seen three ways (its vocabulary, its syntax, its puffery), are one signal, not three. This bar is deliberately looser than anti-slop's suppress-all rule, because this reviewer serves the draft's own author, who asked what readers will flag; it is not a third-party judgment about someone else's text.
 - Do **not** rewrite the draft.
 - Do **not** score it, rate it, or give a percentage.
 - Do **not** estimate whether a model wrote it. Detectors guess; a named pattern is evidence the user can check themselves. That distinction is the whole value of the report.
 
-Offer the rewrite afterward.
+The report is the deliverable. A rewrite happens only if the user asks for one; closing your message by offering it is fine.
 
 ---
 
@@ -682,7 +698,7 @@ Run these grep patterns against the draft. Any hit requires a rewrite of that se
 # Nominalization chains (C32)
 (the implementation of|the utilization of|the facilitation of|the integration of)
 
-# Em dashes (C15) -- TIER 1: most visible structural tell in 2026
+# Em dashes (C15) -- TIER 1: conspicuous reader-facing tell
 —
  --
 
@@ -737,7 +753,7 @@ from\s+.{5,30}\s+to\s+.{5,30},\s+from\s+
 
 ### Pass 1 calibration: grade by density, then thin — don't shave
 
-A raw grep hit is a flag, not an automatic delete. Two rules turn the match list into proportional action.
+A raw grep hit is a flag, not an automatic delete. Before grading anything, discard hits that land inside quotation marks, blockquotes, or code spans (see the standing rule in Phase 2: the mention is not the tell). Two rules turn the remaining match list into proportional action.
 
 **Grade by density, not mere presence.** The tell is co-occurrence, not any single word (see the C9 note; Kobak et al. 2024). Score each pattern by frequency per 1000 words and by position, then rewrite worst-first:
 - **HIGH** — any Tier-1 pattern; OR any pattern at >1 per 1000 words; OR ≥3 tells clustered in one paragraph; OR any tell in the opening/closing paragraph or an abstract/intro (openings are read first and weighted hardest).
@@ -769,6 +785,13 @@ Check these by reading, not by grep:
 9. **Cross-segment style (C35)**: Compare the first paragraph of each major section. If they all follow the same rhetorical pattern (e.g., all start with a general claim, all use similar sentence lengths, all have the same density of technical terms), vary at least two sections.
 
 10. **Noun-verb check (C32)**: Pick any paragraph. Count nouns and verbs. If nouns outnumber verbs by more than 3:1, rewrite nominalized phrases into active constructions.
+
+**Substance spot-check (v2.4.0).** The ten checks above measure style; none of them can tell you whether the text says anything. On the two or three weakest paragraphs (the ones with the most Pass 1 hits, plus the opening and the closing), run two micro-tests:
+
+- **Deletion.** Cut the most abstract sentence and name what was lost. If the honest answer is "nothing", the sentence was padding: delete it for real, and do not replace it with a shorter version of the same nothing.
+- **Inversion.** For any claim of significance, role, or impact ("plays a crucial role in", "shaped the field", "matters because"), write out its negation and ask whether anyone would assert it. "The river plays no role in the regional ecosystem" is a sentence nobody would publish, which means the original excluded no possible state of the world and said nothing. Replace it with the specific fact that earned the claim, or cut it. Definitions and stipulations are exempt; only claims of significance are the target.
+
+A draft can satisfy all 44 constraints and still be hollow. Fluent emptiness passes every style check by construction; these two tests are the guard against shipping it.
 
 ### Pass 3: Self-audit (introspective)
 
@@ -834,7 +857,7 @@ If the user requested the piece in a file, use Write/Edit to save it. If they re
 | C12 | No forced rule-of-three | Language | Three abstract nouns in sequence |
 | C13 | No synonym cycling | Language | Rotating referents for same entity |
 | C14 | No false ranges | Language | from X to Y, from A to B |
-| C15 | Em dash discipline (TIER 1) | Style | Kill on sight. Max 1 per 500 words. Most visible structural tell. |
+| C15 | Em dash discipline (TIER 1) | Style | Kill on sight. Max 1 per 500 words. Conspicuous reader-facing tell. |
 | C16 | Boldface restraint | Style | Only structural headers |
 | C17 | No inline-header lists | Style | `**Label:** content` bullets |
 | C18 | Sentence case headings | Style | Title Case Headings |
@@ -877,6 +900,7 @@ Not every imperfection is an AI tell. The following are NOT reliable signs of AI
 - **Unusual or academic vocabulary.** Domain experts use domain words. A physicist writing "eigenvalue" is not an AI tell.
 - **Letter-like or epistolary structure** in isolation. Humans write letters.
 - **Use of conjunctions** (Additionally, Furthermore, Moreover) in isolation. One "Additionally" is not a tell; five in the same piece is.
+- **Secondhand text.** A watched word or phrase inside a quotation, a title, a proper name, or an example where it is being discussed rather than used. Never flag the mention, and never rewrite quoted source text (see the standing rule in Phase 2).
 
 These are noted as ineffective because over-flagging them produces false positives and wastes editing effort on non-issues. Focus on the 44 constraints above, which target patterns that actually distinguish AI output from human writing at scale.
 
@@ -887,6 +911,9 @@ These are noted as ineffective because over-flagging them produces false positiv
 Primary sources:
 - [blader/humanizer](https://github.com/blader/humanizer) v2.5.1 (MIT, Siqi Chen). Upstream 29-pattern catalog. C36-C39 ported directly; C9 ("actually") and C11 (tailing negations) augmented from upstream PRs #80, #79, #72, #42.
 - [petergyang/no-ai-slop](https://github.com/petergyang/no-ai-slop) (MIT, Peter Yang), commit `61c21c3`, July 2026. An editing-mode skill whose organizing principle is voice preservation. C40-C43 derived from its pattern catalog (faux-insight setups, colon reveals, rhetorical setups, fake-profound kickers), C44 from its often-empty-adverb list, and the C9/C26 hype-register extensions from its banned-word and filler-phrase lists. Phase 2.5 preservation mode and the detect-only doctrine (name the pattern, quote the line, never score or claim AI authorship) are adapted from its editing principles and eval checks.
+- [AgriciDaniel/anti-slop](https://github.com/AgriciDaniel/anti-slop) (Apache-2.0 code, CC BY-SA 4.0 marker references), v0.1.0, July 2026. A defect-verification toolkit that is deliberately not a humanizer; studied as adversarial prior art. Source of the quoted-text standing rule, the Pass 2 substance spot-check (its deletion and inversion structural tests, adapted from verification procedures into self-edit checks), the Phase 2.5 claims audit ("Claims added: 0"), the detect-only "Not flagged" list and ESL bar, the C11 reversed straw-alternative form, the C26 human-signals gate, and the C15 figure correction. Its evidence ledger is why C15 now cites a pre-registered study instead of a folklore multiplier.
+- Czuma, "Em-ergence of the em-dash" (arXiv 2606.29540, pre-registered as OSF HFT8C, 2026). 69,632 medRxiv preprints; em-dash prevalence in Discussion sections roughly tripled post-ChatGPT, with the stated conclusion that the em dash is a population-level indicator, not a per-paper detector of LLM use. Basis for the corrected C15 rationale.
+- Stowe et al., "Identifying Bias in Machine-generated Text Detection" (ACL 2026, arXiv 2512.09292). 16 detection models over-flag English-language-learner essays, compounding for non-White ELL writers, while human annotators on the same essays showed no significant demographic bias. Basis for the detect-only ESL bar.
 - [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) (April 2026 revision), maintained by WikiProject AI Cleanup. Covers all 8 major categories. Platform-specific patterns (broken wikitext, hallucinated Wikipedia categories/templates, AFC submission statements) omitted as not applicable to general writing.
 - Kobak et al. (2024): Excess word frequency analysis across LLM output vs. human baselines. 329 words with statistically significant overuse; top 10 integrated into C9.
 - Reinhart (PNAS 2025): Noun-to-verb ratio distortion in LLM output. Basis for C32.

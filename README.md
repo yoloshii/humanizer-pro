@@ -17,10 +17,10 @@ Five phases run in sequence:
 1. **Calibration** locks the voice profile (register, perspective, stance, audience) before any writing begins. Optionally calibrates from a writing sample to mirror the user's existing voice.
 2. **Composition** applies all 44 constraints as active rules. Each sentence is shaped by them during generation, not checked against them afterward.
 3. **Voice injection** adds the things constraint-following alone can't produce: sentence rhythm variation, opinion insertion, concrete specifics, deliberate imperfection.
-4. **Verification** runs four passes: a grep-based pattern scan for known AI tells (graded HIGH/MED/LOW by density and position, not mere presence), a structural audit (sentence length variance, paragraph openers, confidence variation, noun-verb ratio), an introspective self-audit ("what makes this still sound AI?"), and a read-aloud test. A calibration rule keeps editing proportional: thin clusters rather than scrubbing every instance, because over-correction collapses prose into a flat, equally-detectable "mean."
+4. **Verification** runs four passes: a grep-based pattern scan for known AI tells (graded HIGH/MED/LOW by density and position, not mere presence, with hits inside quotes and code discarded first), a structural audit (sentence length variance, paragraph openers, confidence variation, noun-verb ratio, plus a substance spot-check that runs deletion and inversion micro-tests on the weakest paragraphs), an introspective self-audit ("what makes this still sound AI?"), and a read-aloud test. A calibration rule keeps editing proportional: thin clusters rather than scrubbing every instance, because over-correction collapses prose into a flat, equally-detectable "mean."
 5. **Final output** delivers clean text with no meta-commentary about the process.
 
-**Phase 2.5 (preservation mode)** replaces phases 1-3 when you hand the skill a draft to fix instead of a piece to write. It makes the minimum effective edit, protects hedges and profanity and digressions that carry the author's voice, restores laundered specifics before sanding surface patterns, and returns the edited text plus a short "What changed" list so you can reject any individual edit. Detect-only requests get a report and no rewrite: each constraint that fired, the line it fired on, and the fix. Never a score, and never a guess about whether a model wrote it.
+**Phase 2.5 (preservation mode)** replaces phases 1-3 when you hand the skill a draft to fix instead of a piece to write. It makes the minimum effective edit, protects hedges and profanity and digressions that carry the author's voice, leaves quoted material verbatim, restores laundered specifics before sanding surface patterns, and returns the edited text plus a short "What changed" list ending in a claims audit ("Claims added: 0", so an edit pass can never quietly invent a fact). Detect-only requests get a report and no rewrite: each constraint that fired, the line it fired on, the fix, and a "Not flagged" list showing what was deliberately left alone and why. Never a score, and never a guess about whether a model wrote it. Style-evidenced flags on non-native English writing get a stricter bar, because detectors measurably over-flag ELL writers.
 
 ## The 44 constraints
 
@@ -99,10 +99,13 @@ This skill has three differences:
 
 ## Sources
 
-The constraint set draws from ten primary sources:
+The constraint set draws from thirteen primary sources:
 
 - [blader/humanizer](https://github.com/blader/humanizer) v2.5.1 (MIT, Siqi Chen). Upstream 29-pattern catalog. Direct port for C36-C39; supplemental augments for C9 ("actually"), C11 (tailing negations), and C4 (persuasive authority tropes).
 - [petergyang/no-ai-slop](https://github.com/petergyang/no-ai-slop) (MIT, Peter Yang), July 2026. Editing-mode skill organized around voice preservation. Basis for C40-C44, the C9 hype-register list, the C26 filler-opener additions, Phase 2.5 preservation mode, and the detect-only doctrine.
+- [AgriciDaniel/anti-slop](https://github.com/AgriciDaniel/anti-slop) (Apache-2.0 code, CC BY-SA 4.0 marker references), July 2026. A defect-verification toolkit, deliberately not a humanizer; studied as adversarial prior art. Basis for the quoted-text standing rule, the substance spot-check, the claims audit, the "Not flagged" list, the ELL bar, and the corrected C15 rationale.
+- Czuma (2026). Pre-registered corpus study of em-dash prevalence in 69,632 medRxiv preprints; population-level indicator, not a per-document detector. Basis for the corrected C15 rationale.
+- Stowe et al. (ACL 2026). Detector demographic bias: 16 models over-flag English-language-learner essays while human annotators on the same essays showed no significant demographic bias. Basis for the ELL bar in detect-only mode.
 - [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) (April 2026 revision). WikiProject AI Cleanup. Covers 8 major categories. Basis for C1-C8, C10-C13, C15-C21, C23-C26, C28.
 - Kobak et al. (2024). Excess word frequency in LLM output vs. human baselines. 329 statistically overused words. Top 10 integrated into C9.
 - Reinhart (PNAS 2025). Noun-to-verb ratio distortion in LLM text. Basis for C32.
@@ -113,6 +116,19 @@ The constraint set draws from ten primary sources:
 - Dentella & Wang (EMNLP 2025). Register rigidity in LLM output. Supporting evidence for C35.
 
 ## Changelog
+
+### v2.4.0
+
+Hardened against the failure modes a defect-verification toolkit (AgriciDaniel/anti-slop) documents in humanizer-class tools. No new constraints; the count stays at 44.
+
+- **Quoted text is off-limits.** A new standing rule binding every phase: a watched phrase that is quoted, mentioned, or discussed is not a hit. Pass 1 discards matches inside quotes, blockquotes, and code before grading density. Closes a real bug class where a draft quoting someone's words, or discussing AI patterns, would get its quotes restyled.
+- **Substance spot-check in Pass 2.** Deletion and inversion micro-tests on the weakest paragraphs: cut the most abstract sentence and name what was lost; negate each significance claim and ask if anyone would assert the negation. A draft can pass all 44 constraints and still say nothing; this is the guard against fluent emptiness.
+- **Claims audit in preservation mode.** The "What changed" list now ends with "Claims added: 0". Any fact, name, number, or date not in the source and not from the user is an invention to remove. An edit pass changes how things are said, never what is claimed.
+- **"Not flagged" list in detect-only mode**, naming the patterns deliberately not reported and why. Restraint becomes visible instead of indistinguishable from a miss.
+- **ELL bar.** Style-evidenced flags on non-native English writing need a higher bar, not a lower one (Stowe et al., ACL 2026: detectors over-flag ELL essays, while human annotators in the same study showed no significant bias). Isolated style flags are suppressed; only clusters of three or more independent signals get reported.
+- **C15 rationale corrected.** The unsourced "3-10x the rate of human writers" multiplier is gone; the constraint now cites the one pre-registered measurement (Czuma 2026) together with its own caveat that em-dash rate is a population-level indicator, not a per-document detector. The cap survives as reader-perception discipline.
+- **C26 human-signals gate.** "In order to" and its neighbors sit on Wikipedia's observed list of *human*-writing signals; stripping every instance moves text toward the generated register. The kill-and-replace map is now a default for stacks, not an absolute.
+- **C11 gains the reversed straw-alternative form** ("X rather than Y" where nobody proposed Y), and **C27 the sharper repair rule**: when the hedged claim is vacuous, cut the claim, not the hedge.
 
 ### v2.3.0
 
